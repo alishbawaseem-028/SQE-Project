@@ -1,89 +1,94 @@
-students = []
+# main.py
 
-# Add Student
-def add_student():
-    # .strip() removes accidental extra spaces
-    name = input("Enter student name: ").strip()
+class StudentManagementSystem:
+    def __init__(self):
+        self.students = []
 
-    if name == "":
-        print("\n❌ ERROR: Name cannot be empty!")
-    elif name.lower() in [s.lower() for s in students]:
-        print(f"\n⚠️ WARNING: '{name}' already exists in the system!")
-    else:
-        students.append(name)
-        print(f"\n✅ SUCCESS: '{name}' added successfully!")
+    # Normalize helper (avoids duplicate logic)
+    def normalize(self, name):
+        return name.strip().lower()
 
-# View Students
-def view_students():
-    if len(students) == 0:
-        print("\n📭 Notice: No students found in the database.")
-    else:
-        print("\n===============================")
-        print(f"📊 STUDENT LIST ({len(students)} Total)")
-        print("===============================")
-        for index, student in enumerate(students, 1):
-            print(f"{index}. {student}")
-        print("===============================")
+    # Add Student
+    def add_student(self, name):
+        name = name.strip()
 
-# Search Student
-def search_student():
-    if len(students) == 0:
-        print("\n📭 Notice: Database is empty. Nothing to search.")
-        return
+        if name == "":
+            return "ERROR: Name cannot be empty!"
 
-    search_name = input("Enter student name to search: ").strip()
-    
-    # Case-insensitive search
-    found_students = [s for s in students if s.lower() == search_name.lower()]
+        if self.normalize(name) in [self.normalize(s) for s in self.students]:
+            return f"WARNING: '{name}' already exists!"
 
-    if found_students:
-        print(f"\n🔍 RESULT: Student '{found_students[0]}' was found in the system!")
-    else:
-        print(f"\n❌ RESULT: Student '{search_name}' NOT found!")
+        self.students.append(name)
+        return f"SUCCESS: '{name}' added successfully!"
 
-# Delete Student
-def delete_student():
-    if len(students) == 0:
-        print("\n📭 Notice: Database is empty. Nothing to delete.")
-        return
+    # View Students
+    def view_students(self):
+        if len(self.students) == 0:
+            return "No students found."
 
-    delete_name = input("Enter student name to delete: ").strip()
-    
-    # Find the exact match in the list regardless of how it was typed
-    match = None
-    for s in students:
-        if s.lower() == delete_name.lower():
-            match = s
+        result = []
+        for i, s in enumerate(self.students, 1):
+            result.append(f"{i}. {s}")
+        return result
+
+    # Search Student
+    def search_student(self, name):
+        name = self.normalize(name)
+
+        for s in self.students:
+            if self.normalize(s) == name:
+                return f"FOUND: {s}"
+
+        return "NOT FOUND"
+
+    # Delete Student
+    def delete_student(self, name):
+        name = self.normalize(name)
+
+        for s in self.students:
+            if self.normalize(s) == name:
+                self.students.remove(s)
+                return f"DELETED: {s}"
+
+        return "NOT FOUND"
+
+
+# ================= MAIN MENU =================
+if __name__ == "__main__":
+    system = StudentManagementSystem()
+
+    while True:
+        print("\n===== STUDENT MANAGEMENT SYSTEM =====")
+        print("1. Add Student")
+        print("2. View Students")
+        print("3. Search Student")
+        print("4. Delete Student")
+        print("5. Exit")
+
+        choice = input("Enter choice: ").strip()
+
+        if choice == "1":
+            name = input("Enter name: ")
+            print(system.add_student(name))
+
+        elif choice == "2":
+            result = system.view_students()
+            if isinstance(result, list):
+                print("\n".join(result))
+            else:
+                print(result)
+
+        elif choice == "3":
+            name = input("Enter name: ")
+            print(system.search_student(name))
+
+        elif choice == "4":
+            name = input("Enter name: ")
+            print(system.delete_student(name))
+
+        elif choice == "5":
+            print("Program exited.")
             break
 
-    if match:
-        students.remove(match)
-        print(f"\n🗑️ SUCCESS: '{match}' has been deleted from the system!")
-    else:
-        print(f"\n❌ ERROR: Could not delete. '{delete_name}' not found!")
-
-# Main Menu Loop
-while True:
-    print("\n===== STUDENT MANAGEMENT SYSTEM =====")
-    print("1. Add Student")
-    print("2. View Students")
-    print("3. Search Student")
-    print("4. Delete Student")
-    print("5. Exit")
-    print("=====================================")
-
-    choice = input("Enter your choice (1-5): ").strip()
-
-    if choice == "1":
-        add_student()
-    elif choice == "2":
-        view_students()
-    elif choice == "3":
-        search_student()
-    elif choice == "4":
-        delete_student()
-    elif choice == "5":
-        print("\n🚪 Program Closed. Goodbye!")
-        break
-    else:
-        print("\n❌ Invalid choice! Please enter a number from 1 to 5.")
+        else:
+            print("Invalid choice!")
