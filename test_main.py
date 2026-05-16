@@ -1,21 +1,47 @@
+# test_main.py
+
 import unittest
-students = ["Ali", "Ahmed"]
-# Test Class
-class TestStudentManagement(unittest.TestCase):
-    # Test Search
-    def test_search_student(self):
-        self.assertIn("Ali", students)
-    # Test Delete
-    def test_delete_student(self):
-        students.remove("Ahmed")
-        self.assertNotIn("Ahmed", students)
-    # Test Add
+from main import StudentManagementSystem
+
+
+class TestStudentManagementSystem(unittest.TestCase):
+
+    def setUp(self):
+        self.system = StudentManagementSystem()
+        self.system.students = ["Ali", "Ahmed"]
+
+    # Test Add Student
     def test_add_student(self):
+        result = self.system.add_student("Usama")
+        self.assertIn("SUCCESS", result)
+        self.assertIn("Usama", self.system.students)
 
-        students.append("Usama")
+    # Test Add Duplicate
+    def test_add_duplicate(self):
+        result = self.system.add_student("Ali")
+        self.assertIn("already exists", result)
 
-        self.assertIn("Usama", students)
+    # Test Search Found
+    def test_search_found(self):
+        result = self.system.search_student("Ali")
+        self.assertIn("FOUND", result)
 
-# Run Tests
+    # Test Search Not Found
+    def test_search_not_found(self):
+        result = self.system.search_student("Zain")
+        self.assertEqual(result, "NOT FOUND")
+
+    # Test Delete Student
+    def test_delete_student(self):
+        result = self.system.delete_student("Ahmed")
+        self.assertIn("DELETED", result)
+        self.assertNotIn("Ahmed", self.system.students)
+
+    # Test Delete Not Found
+    def test_delete_not_found(self):
+        result = self.system.delete_student("Zain")
+        self.assertEqual(result, "NOT FOUND")
+
+
 if __name__ == "__main__":
     unittest.main()
